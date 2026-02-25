@@ -956,7 +956,7 @@ int32_t MouseDevice::ABS2AXIS(int32_t absaxis){
     case ABS_VOLUME: return MotionEvent::AXIS_VSCROLL;
     case ABS_HAT0X : return MotionEvent::AXIS_HSCROLL;
     case ABS_HAT0Y : return MotionEvent::AXIS_VSCROLL;
-#if def REL_WHEEL_HI_RES
+#ifndef REL_WHEEL_HI_RES
     case REL_WHEEL_HI_RES:
 #endif
     case REL_WHEEL:/*REL_WHEEL*/ return MotionEvent::AXIS_VSCROLL;
