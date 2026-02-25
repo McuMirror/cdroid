@@ -323,7 +323,7 @@ bool PathMeasure::getSegment(double start, double stop,Cairo::RefPtr<cdroid::Pat
         } else { // Cubic
             PointD q0, q1, q2, q3;
             if ((t0 == 0.0) && (t1 == 1.0)) {
-                q0 = pts[0]; q1 = pts[1]; q2 = pts[1]; q3 = pts[3];
+                q0 = pts[0]; q1 = pts[1]; q2 = pts[2]; q3 = pts[3];
             } else if(t1>t0+FLT_EPSILON){
                 bezierSplit(pts[0],pts[1],pts[2],pts[3],t0,t1, q0, q1, q2, q3);
             }
