@@ -31,9 +31,16 @@
 #include <core/systemclock.h>
 #include <core/windowmanager.h>
 #include <private/keylayoutmap.h>
+
 #if defined(__linux__)||defined(__unix__)
   #include <linux/input.h>
-#elif defined(_WIN32)||defined(_WIN64)
+  #ifndef REL_WHEEL_HI_RES
+  #define REL_WHEEL_HI_RES 0x0b
+  #endif
+  #ifndef REL_HWHEEL_HI_RES
+  #define REL_HWHEEL_HI_RES 0x0c
+  #endif
+#else//if defined(_WIN32)||defined(_WIN64)
   #include <core/eventcodes.h>   
 #endif
 
@@ -956,13 +963,9 @@ int32_t MouseDevice::ABS2AXIS(int32_t absaxis){
     case ABS_VOLUME: return MotionEvent::AXIS_VSCROLL;
     case ABS_HAT0X : return MotionEvent::AXIS_HSCROLL;
     case ABS_HAT0Y : return MotionEvent::AXIS_VSCROLL;
-#ifndef REL_WHEEL_HI_RES
     case REL_WHEEL_HI_RES:
-#endif
     case REL_WHEEL:/*REL_WHEEL*/ return MotionEvent::AXIS_VSCROLL;
-#ifdef REL_HWHEEL_HI_RES
     case REL_HWHEEL_HI_RES:
-#endif
     case REL_HWHEEL:return MotionEvent::AXIS_HSCROLL;
     default:return  -1;
     }

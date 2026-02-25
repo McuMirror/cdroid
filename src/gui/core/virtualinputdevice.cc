@@ -4,7 +4,19 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <core/virtualinputdevice.h>
-#include <linux/uinput.h>
+
+#if defined(__linux__)||defined(__unix__)
+  #include <linux/input.h>
+  #ifndef REL_WHEEL_HI_RES
+  #define REL_WHEEL_HI_RES 0x0b
+  #endif
+  #ifndef REL_HWHEEL_HI_RES
+  #define REL_HWHEEL_HI_RES 0x0c
+  #endif
+#else
+  #include <core/eventcodes.h>
+#endif
+
 #include <porting/cdlog.h>
 #include <cstring>
 #include <string>
@@ -16,12 +28,6 @@ constexpr bool isDebug() {
 namespace vd_flags{
     constexpr bool high_resolution_scroll(){return false;}
 }
-#ifndef REL_WHEEL_HI_RES
-#define REL_WHEEL_HI_RES 0x0b
-#endif
-#ifndef REL_HWHEEL_HI_RES
-#define REL_HWHEEL_HI_RES 0x0c
-#endif
 namespace cdroid {
 
 /** Creates a new uinput device and assigns a file descriptor. */

@@ -1,4 +1,4 @@
-# **V4.6.8
+# **V4.6.9
   - add MotionEvent for MouseDevice support.
   - add Tablayout::setTabIndicatorAnimationMode(tabIndicatorAnimationMode:linear,elastic,fade)
   - add TabLayoutMediator(make TabLayout working friendly with ViewPager2)
