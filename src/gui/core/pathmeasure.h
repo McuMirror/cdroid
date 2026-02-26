@@ -26,8 +26,8 @@ class PathMeasure{
 private:
     struct Segment {
         enum Type { Line, Cubic };
-        int32_t ptIndex:30;
         int32_t type:2;
+        int32_t ptIndex:30;
         double distance;
     };
 private:

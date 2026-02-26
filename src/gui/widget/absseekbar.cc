@@ -217,7 +217,6 @@ void AbsSeekBar::setThumb(Drawable*thumb){
     if ((mThumb != nullptr) && (thumb != mThumb)) {
         mThumb->setCallback(nullptr);
         needUpdate = true;
-
     }
 
     if (thumb != nullptr) {
@@ -296,6 +295,7 @@ Drawable* AbsSeekBar::getTickMark()const{
 
 void AbsSeekBar::setThumbOffset(int thumbOffset){
     mThumbOffset = thumbOffset;
+    updateThumbAndTrackPos(getWidth(),getHeight());
     invalidate(true);
 }
 
