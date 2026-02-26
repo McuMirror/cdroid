@@ -224,8 +224,8 @@ void ShapeDrawable::draw(Canvas&canvas){
         }
         mShapeState->mShape->draw(canvas,r.left,r.top);
         if(mTintFilter){
-            mTintFilter->apply(canvas,r);
             canvas.pop_group_to_source();
+            mTintFilter->apply(canvas,r);
             canvas.paint();
             canvas.restore();
         }
