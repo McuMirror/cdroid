@@ -288,8 +288,8 @@ void NinePatchDrawable::draw(Canvas&canvas){
         }
         mNinePatchState->draw(canvas,mBounds,mAlpha);
         if(mTintFilter){
-            mTintFilter->apply(canvas,mBounds);
             canvas.pop_group_to_source();
+            mTintFilter->apply(canvas,mBounds);
             canvas.paint();
         }
         canvas.restore();
