@@ -215,6 +215,13 @@ void PooledInputEventFactory::recycle(InputEvent* event) {
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 // --- IdGenerator ---
+#ifndef TEMP_FAILURE_RETRY
+#define TEMP_FAILURE_RETRY(expression) \
+    ({ long int __result; \
+       do __result = (long int)(expression); \
+       while (__result == -1L && errno == EINTR); \
+       __result; })
+#endif
 static bool ReadFully(int fd, void* data, size_t byte_count) {
     uint8_t* p = reinterpret_cast<uint8_t*>(data);
     size_t remaining = byte_count;

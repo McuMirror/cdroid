@@ -31,9 +31,16 @@
 #include <core/systemclock.h>
 #include <core/windowmanager.h>
 #include <private/keylayoutmap.h>
+
 #if defined(__linux__)||defined(__unix__)
   #include <linux/input.h>
-#elif defined(_WIN32)||defined(_WIN64)
+  #ifndef REL_WHEEL_HI_RES
+  #define REL_WHEEL_HI_RES 0x0b
+  #endif
+  #ifndef REL_HWHEEL_HI_RES
+  #define REL_HWHEEL_HI_RES 0x0c
+  #endif
+#else//if defined(_WIN32)||defined(_WIN64)
   #include <core/eventcodes.h>   
 #endif
 
