@@ -53,7 +53,7 @@ public:
  * G' = G * colorMultiply.G + colorAdd.G
  * B' = B * colorMultiply.B + colorAdd.B
  * The result is pinned to the <code>[0..255]</code> range for each channel*/
-class LightingColorFilter:public ColorMatrixColorFilter{
+class LightingColorFilter:public ColorFilter{
 protected:
     int mMul;
     int mAdd;
