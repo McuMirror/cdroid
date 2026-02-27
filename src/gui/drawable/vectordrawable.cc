@@ -102,9 +102,8 @@ void VectorDrawable::draw(Canvas& canvas) {
     }
     const int pixelCount = mVectorState->mNativeTree->draw(canvas,nullptr,mTmpBounds,needMirroring(),canReuseCache);
     if(colorFilter){
+        canvas.set_source(canvas.pop_group());
         mTintFilter->apply(canvas,mBounds);
-        canvas.pop_group_to_source();
-        canvas.paint();
     }
     if (pixelCount == 0) {
         // Invalid canvas matrix or drawable bounds. This would not affect existing bitmap

@@ -460,9 +460,8 @@ void BitmapDrawable::draw(Canvas&canvas){
     }
 
     if(mTintFilter){
+        canvas.set_source(canvas.pop_group());
         mTintFilter->apply(canvas,mBounds);
-        canvas.pop_group_to_source();
-        canvas.paint();
     }
     canvas.restore();
 }

@@ -35,15 +35,18 @@ void ColorMatrixColorFilter::apply(Canvas&canvas,const Rect&rect){
 }
 
 PorterDuffColorFilter::PorterDuffColorFilter(int color,int mode){
-    mColor=color;
-    mMode=mode;
+    mColor= color;
+    mMode = mode;
 }
 
 void PorterDuffColorFilter::apply(Canvas&canvas,const Rect&rect){
-    canvas.set_operator((Cairo::Context::Operator)PorterDuff::toOperator(mMode));//2,5(6,7),8,9
+    Cairo::RefPtr<Cairo::Pattern> pattern = canvas.get_source();
     canvas.set_color(mColor);
+    canvas.mask(pattern);
+    canvas.set_operator(Cairo::Context::Operator(10));//(Cairo::Context::Operator)PorterDuff::toOperator(mMode));
     canvas.paint();
 }
+
 void PorterDuffColorFilter::setColor(int c){
     mColor=c;
 }
@@ -53,7 +56,7 @@ int PorterDuffColorFilter::getColor()const{
 }
 
 void PorterDuffColorFilter::setMode(int m){
-    mMode=m;
+    mMode = m;
 }
 
 int PorterDuffColorFilter::getMode()const{
@@ -61,8 +64,8 @@ int PorterDuffColorFilter::getMode()const{
 }
 
 LightingColorFilter::LightingColorFilter(int mul,int add){
-    mMul=mul;
-    mAdd=add;
+    mMul = mul;
+    mAdd = add;
 }
 
 void LightingColorFilter::apply(Canvas&canvas,const Rect&rect){
