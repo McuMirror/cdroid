@@ -92,34 +92,19 @@ void LightingColorFilter::apply(Canvas&canvas,const Rect&rect){
         return;
     }
 
-    auto surf_pat = std::dynamic_pointer_cast<Cairo::SurfacePattern>(pat);
-    auto orig_surf = surf_pat->get_surface();
-    const int width  = rect.width;//orig_surf->get_width();
-    const int height = rect.height;//orig_surf->get_height();
-
     // always work on an ImageSurface copy so we can access pixels
-    auto img = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, width, height);
+    auto img = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, rect.width, rect.height);
     {
         auto cr = Cairo::Context::create(img);
-        cr->set_source(orig_surf,0,0);
+        cr->set_source(pat);
         cr->paint();
     }
 
     Color cmul(mMul);
     Color cadd(mAdd);
 
-    const int left   = std::max(rect.left, 0);
-    const int top    = std::max(rect.top, 0);
-    const int right  = std::min(rect.right(), width);
-    const int bottom = std::min(rect.bottom(), height);
-
     // perform multiply/add by painting with appropriate operators
     auto cr2 = Cairo::Context::create(img);
-    cr2->save();
-    if (left < right && top < bottom) {
-        cr2->rectangle(left, top, width, height);
-        cr2->clip();
-    }
 
     cr2->set_operator((Cairo::Context::Operator)CAIRO_OPERATOR_MULTIPLY);
     cr2->set_source_rgba(cmul.red(), cmul.green(), cmul.blue(), cmul.alpha());
@@ -128,8 +113,6 @@ void LightingColorFilter::apply(Canvas&canvas,const Rect&rect){
     cr2->set_operator((Cairo::Context::Operator)CAIRO_OPERATOR_ADD);
     cr2->set_source_rgba(cadd.red(), cadd.green(), cadd.blue(), cadd.alpha());
     cr2->paint();
-
-    cr2->restore();
 
     img->mark_dirty();
 
