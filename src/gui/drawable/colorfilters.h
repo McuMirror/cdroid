@@ -59,6 +59,10 @@ protected:
     int mAdd;
 public:
     LightingColorFilter(int mul,int add);
+    int getColorMultiply()const;
+    void setColorMultiply(int mul);
+    int getColorAdd()const;
+    void setColorAdd(int add);
     void apply(Canvas&canvas,const Rect&)override;
 };
 }/*endof namespace*/

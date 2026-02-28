@@ -35,15 +35,18 @@ void ColorMatrixColorFilter::apply(Canvas&canvas,const Rect&rect){
 }
 
 PorterDuffColorFilter::PorterDuffColorFilter(int color,int mode){
-    mColor=color;
-    mMode=mode;
+    mColor= color;
+    mMode = mode;
 }
 
 void PorterDuffColorFilter::apply(Canvas&canvas,const Rect&rect){
-    canvas.set_operator((Cairo::Context::Operator)PorterDuff::toOperator(mMode));//2,5(6,7),8,9
+    Cairo::RefPtr<Cairo::Pattern> pattern = canvas.get_source();
     canvas.set_color(mColor);
+    canvas.mask(pattern);
+    canvas.set_operator(Cairo::Context::Operator(10));//(Cairo::Context::Operator)PorterDuff::toOperator(mMode));
     canvas.paint();
 }
+
 void PorterDuffColorFilter::setColor(int c){
     mColor=c;
 }
@@ -53,7 +56,7 @@ int PorterDuffColorFilter::getColor()const{
 }
 
 void PorterDuffColorFilter::setMode(int m){
-    mMode=m;
+    mMode = m;
 }
 
 int PorterDuffColorFilter::getMode()const{
@@ -61,57 +64,62 @@ int PorterDuffColorFilter::getMode()const{
 }
 
 LightingColorFilter::LightingColorFilter(int mul,int add){
-    mMul=mul;
-    mAdd=add;
+    mMul = mul;
+    mAdd = add;
+}
+
+int LightingColorFilter::getColorMultiply()const{
+    return mMul;
+}
+
+void LightingColorFilter::setColorMultiply(int mul){
+    mMul = mul;
+}
+
+int LightingColorFilter::getColorAdd()const{
+    return mAdd;
+}
+
+void LightingColorFilter::setColorAdd(int add){
+    mAdd =add;
 }
 
 void LightingColorFilter::apply(Canvas&canvas,const Rect&rect){
-    // 在这里，假设 cr->source() 已经是你通过 push_group 和 pop_group_to_source 设置好的图像源
-    Cairo::RefPtr<Cairo::Pattern> pattern = canvas.get_source();
-    if(pattern->get_type() != Cairo::Pattern::Type::SURFACE){
+    // extract source pattern and rasterize it to an image surface if needed
+    Cairo::RefPtr<Cairo::Pattern> pat = canvas.get_source();
+    if (pat->get_type() != Cairo::Pattern::Type::SURFACE) {
         LOGE("LightingColorFilter only supports surface pattern as source");
         return;
     }
-    Cairo::RefPtr<Cairo::SurfacePattern> surface_pattern = std::dynamic_pointer_cast<Cairo::SurfacePattern>(pattern);
-    Cairo::RefPtr<Cairo::ImageSurface> surface = std::dynamic_pointer_cast<Cairo::ImageSurface>(surface_pattern->get_surface());
-    auto temp_mul_surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, surface->get_width(), surface->get_height());
-    auto temp_mul_cr = Cairo::Context::create(temp_mul_surface);
 
-    // 使用 mMul 颜色填充临时表面
+    // always work on an ImageSurface copy so we can access pixels
+    auto img = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, rect.width, rect.height);
+    {
+        auto cr = Cairo::Context::create(img);
+        cr->set_source(pat);
+        cr->paint();
+    }
+
     Color cmul(mMul);
-    temp_mul_cr->set_source_rgba(cmul.red(), cmul.green(), cmul.blue(),cmul.alpha());
-    temp_mul_cr->paint(); // Fill entire temporary surface with mMul color
-
-    // 创建临时表面的图案模式
-    auto mul_pattern = Cairo::SurfacePattern::create(temp_mul_surface);
-
-    // 创建临时表面用于加法层
-    auto temp_add_surface = Cairo::ImageSurface::create(Cairo::Surface::Format::ARGB32, surface->get_width(), surface->get_height());
-    auto temp_add_cr = Cairo::Context::create(temp_add_surface);
-
-    // 使用 mAdd 颜色填充临时表面
     Color cadd(mAdd);
-    temp_add_cr->set_source_rgba(cadd.red(), cadd.green(), cadd.blue(),cadd.alpha());
-    temp_add_cr->paint(); // Fill entire temporary surface with mAdd color
 
-    // 创建临时表面的图案模式
-    auto add_pattern = Cairo::SurfacePattern::create(temp_add_surface);
+    // perform multiply/add by painting with appropriate operators
+    auto cr2 = Cairo::Context::create(img);
 
-    // 应用乘法层。
-    // Cairo::Context::Operator 枚举中没有 MULTIPLY，使用 PorterDuff helper 或者
-    // 直接 cast CAIRO_OPERATOR_MULTIPLY
-    canvas.save();
-    canvas.set_operator((Cairo::Context::Operator)PorterDuff::toOperator(PorterDuff::MULTIPLY));
-    canvas.set_source(mul_pattern);
+    cr2->set_operator((Cairo::Context::Operator)CAIRO_OPERATOR_MULTIPLY);
+    cr2->set_source_rgba(cmul.red(), cmul.green(), cmul.blue(), cmul.alpha());
+    cr2->paint();
+
+    cr2->set_operator((Cairo::Context::Operator)CAIRO_OPERATOR_ADD);
+    cr2->set_source_rgba(cadd.red(), cadd.green(), cadd.blue(), cadd.alpha());
+    cr2->paint();
+
+    img->mark_dirty();
+
+    // replace canvas source with filtered image
+    auto new_pat = Cairo::SurfacePattern::create(img);
+    canvas.set_source(new_pat);
     canvas.paint();
-
-    // 应用加法层。
-    // Operator::ADD 存在，但我们还是通过 PorterDuff 统一转换，以便于以后扩展。
-    canvas.set_operator((Cairo::Context::Operator)PorterDuff::toOperator(PorterDuff::ADD));
-    canvas.set_source(add_pattern);
-    canvas.paint();
-
-    canvas.restore();
 }
 
 }
