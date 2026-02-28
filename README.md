@@ -63,15 +63,15 @@
 * git clone https://www.github.com/microsoft/vcpkg.git
 * cd vcpkg
 * ./bootstrap-vcpkg.sh
-### 3. install cdroid supported toolchain's patch
+### 3.download cdroid source code:
+* cd ~
+* git clone http://www.gitee.com/houstudio/cdroid.git<br>
+### 4. install cdroid supported toolchain's patch
 * cp cdroid/script/vcpkgpatch4cdroid.tar.gz vcpkg/
 * cd vcpkg
 * tar -zxvf vcpkgpatch4cdroid.tar.gz 
-### 4.install cdroid deplibs:
+### 5.install cdroid deplibs:
 * ./cdroid_install_libs.sh --triplet=x64-linux-dynamic<br>
-### 5.download cdroid source code:
-* cd ~
-* git clone http://www.gitee.com/houstudio/cdroid.git<br>
 ### 6.build cdroid:
 * cd cdroid
 * ./build.sh --build=debug
