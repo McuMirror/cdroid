@@ -542,7 +542,8 @@ int Assets::getDimension(const std::string&refid)const{
     auto it = mDimensions.find(name);
     if(it != mDimensions.end()) 
         return it->second;
-    throw std::runtime_error("Resource not found:" + refid);
+    LOGW("Resource not found:%s",refid.c_str());
+    return 0;
 }
 
 int Assets::getDimensionPixelSize(const std::string&refid,int def)const{
@@ -648,7 +649,7 @@ void Assets::clearStyles() {
 }
 
 std::string Assets::resolveAttrValue(const std::string&attrResId)const{
-    std::string name=attrResId;
+    std::string name = attrResId;
     AttributeSet atts;
     size_t pos = name.find("attr/");
     if(pos!=std::string::npos){
@@ -666,8 +667,9 @@ std::string Assets::resolveAttrValue(const std::string&attrResId)const{
             pos = name.find("attr");
         }while(pos!=std::string::npos);
         name = parseResource(name,nullptr,nullptr);
-        return name;
     }
+    if((pos=name.find("@"))!=std::string::npos)
+        name.erase(pos,1);
     return name;
 }
 
